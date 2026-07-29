@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sorteos Adricar — Sorteos verificados y transparentes</title>
+<meta name="description" content="Sorteos Adricar. Compra tickets, recibe tu código y verifica tu participación en segundos. Sorteos transparentes con evidencia pública de cada ganador.">
+
+<!-- Tailwind CSS (CDN) -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          adricar: {
+            indigo: '#1B2456',
+            indigoLight: '#3D4FA0',
+            indigoPale: '#EEF0FA',
+            gold: '#E9A23B',
+            goldDark: '#C9861F',
+            goldPale: '#FDF3E2',
+            emerald: '#0FA968',
+            emeraldPale: '#E7F8F0',
+            ink: '#0F1729',
+            muted: '#5B6478',
+            bg: '#F6F7FB',
+            line: '#E5E8F0',
+          }
+        },
+        fontFamily: {
+          display: ['"Space Grotesk"', 'sans-serif'],
+          sans: ['"Inter"', 'sans-serif'],
+          mono: ['"JetBrains Mono"', 'monospace'],
+        },
+        boxShadow: {
+          card: '0 1px 2px rgba(15, 23, 41, 0.04), 0 8px 24px -8px rgba(27, 36, 86, 0.10)',
+          cardHover: '0 4px 12px rgba(15, 23, 41, 0.06), 0 20px 40px -12px rgba(27, 36, 86, 0.18)',
+          glass: '0 8px 32px rgba(27, 36, 86, 0.12)',
+        },
+        borderRadius: {
+          '2xl': '1.25rem',
+          '3xl': '1.75rem',
+        }
+      }
+    }
+  }
+</script>
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<!-- Icons -->
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+<link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-adricar-bg text-adricar-ink font-sans antialiased">
+
+<!-- ======================================================= -->
+<!-- TOAST CONTAINER                                          -->
+<!-- ======================================================= -->
+<div id="toast-container" class="fixed top-5 right-5 z-[200] flex flex-col gap-3 w-[calc(100%-2.5rem)] max-w-sm"></div>
+
+<!-- ======================================================= -->
+<!-- PUBLIC SITE VIEW                                         -->
+<!-- ======================================================= -->
+<div id="public-view">
+
+  <!-- ============== HEADER / NAV ============== -->
+  <header id="site-header" class="fixed top-0 inset-x-0 z-[90] transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-5 sm:px-8">
+      <div id="nav-shell" class="flex items-center justify-between h-[72px] transition-all duration-300">
+        <a href="#inicio" class="flex items-center gap-2.5 shrink-0">
+          <span class="relative flex items-center justify-center w-10 h-10 rounded-xl bg-adricar-indigo">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2L4 5.5V11C4 16.2 7.4 20.8 12 22C16.6 20.8 20 16.2 20 11V5.5L12 2Z" stroke="#E9A23B" stroke-width="1.7" stroke-linejoin="round"/>
+              <path d="M8.5 12L10.8 14.3L15.7 9.3" stroke="#E9A23B" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <span class="font-display font-semibold text-lg tracking-tight text-adricar-indigo">Sorteos <span class="text-adricar-goldDark">Adricar</span></span>
+        </a>
+
+        <nav class="hidden lg:flex items-center gap-1">
+          <a href="#sorteos" class="nav-link">Sorteos</a>
+          <a href="#verificar" class="nav-link">Verificar participación</a>
+          <a href="#ganadores" class="nav-link">Ganadores</a>
+          <a href="#galeria" class="nav-link">Galería</a>
+          <a href="#testimonios" class="nav-link">Testimonios</a>
+          <a href="#faq" class="nav-link">Preguntas</a>
+        </nav>
+
+        <div class="flex items-center gap-2 sm:gap-3">
+          <button data-action="open-verify" class="hidden sm:inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-semibold text-adricar-indigo hover:bg-adricar-indigoPale transition-colors">
+            <i data-lucide="shield-check" class="w-4 h-4"></i>
+            Verificar
+          </button>
+          <button data-action="open-purchase" class="btn-gold text-sm px-4 sm:px-5 py-2.5">
+            Comprar tickets
+          </button>
+          <button id="mobile-menu-btn" class="lg:hidden w-10 h-10 flex items-center justify-center rounded-xl border border-adricar-line text-adricar-indigo">
+            <i data-lucide="menu" class="w-5 h-5"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile nav -->
+    <div id="mobile-menu" class="lg:hidden hidden bg-white border-t border-adricar-line shadow-card">
+      <nav class="flex flex-col px-5 py-3">
+        <a href="#sorteos" class="mobile-nav-link">Sorteos</a>
+        <a href="#verificar" class="mobile-nav-link">Verificar participación</a>
+        <a href="#ganadores" class="mobile-nav-link">Ganadores</a>
+        <a href="#galeria" class="mobile-nav-link">Galería</a>
+        <a href="#testimonios" class="mobile-nav-link">Testimonios</a>
+        <a href="#faq" class="mobile-nav-link">Preguntas</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- ============== HERO ============== -->
+    <section id="inicio" class="relative pt-40 pb-20 sm:pt-48 sm:pb-28 overflow-hidden">
+      <div class="hero-mesh"></div>
+      <div class="max-w-7xl mx-auto px-5 sm:px-8 relative">
+        <div class="grid lg:grid-cols-[1.05fr_0.95fr] gap-14 items-center">
+
+          <div class="reveal-up">
+            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/70 backdrop-blur border border-adricar-line text-xs font-semibold text-adricar-indigo shadow-sm">
+              <span class="w-1.5 h-1.5 rounded-full bg-adricar-emerald live-dot"></span>
+              Verificación pública disponible ahora
+            </div>
+
+            <h1 class="mt-6 font-display font-semibold text-[2.6rem] leading-[1.08] sm:text-6xl sm:leading-[1.05] tracking-tight text-adricar-indigo">
+              El sorteo que puedes <span class="relative whitespace-nowrap text-underline-gold">comprobar</span>,<br class="hidden sm:block">
+              no solo creer.
+            </h1>
+
+            <p class="mt-6 text-lg text-adricar-muted max-w-xl leading-relaxed">
+              Compra tus tickets, recibe tu código al instante y verifica tu participación cuando quieras con tu DNI, teléfono o código. Cada ganador queda publicado con evidencia. Sin letras pequeñas.
+            </p>
+
+            <div class="mt-8 flex flex-col sm:flex-row gap-3">
+              <button data-action="open-purchase" class="btn-gold justify-center text-base px-7 py-3.5">
+                <i data-lucide="ticket" class="w-[18px] h-[18px]"></i>
+                Comprar tickets
+              </button>
+              <button data-action="open-verify" class="btn-outline justify-center text-base px-7 py-3.5">
+                <i data-lucide="search-check" class="w-[18px] h-[18px]"></i>
+                Verificar participación
+              </button>
+            </div>
+
+            <div class="mt-10 flex items-center gap-6">
+              <div class="flex -space-x-3">
+                <div class="avatar-stack" style="background:linear-gradient(135deg,#3D4FA0,#1B2456)">MR</div>
+                <div class="avatar-stack" style="background:linear-gradient(135deg,#E9A23B,#C9861F)">LT</div>
+                <div class="avatar-stack" style="background:linear-gradient(135deg,#0FA968,#0B7A4C)">JS</div>
+                <div class="avatar-stack" style="background:linear-gradient(135deg,#5B6478,#1B2456)">+9k</div>
+              </div>
+              <p class="text-sm text-adricar-muted"><span class="font-semibold text-adricar-ink">+9,400 tickets</span> verificados este mes</p>
+            </div>
+          </div>
+
+          <div class="reveal-up reveal-delay-1">
+            <div id="hero-raffle-card" class="glass-panel p-2.5 sm:p-3 relative">
+              <!-- prize visual -->
+              <div class="rounded-2xl overflow-hidden relative h-56 sm:h-64 prize-gradient-1 flex items-center justify-center">
+                <div class="seal-badge">
+                  <i data-lucide="shield-check" class="w-4 h-4"></i>
+                  Sorteo verificado
+                </div>
+                <svg width="120" height="120" viewBox="0 0 24 24" fill="none" class="opacity-90 drop-shadow-xl">
+                  <path d="M5 11L6.5 6.5C6.8 5.6 7.6 5 8.6 5H15.4C16.4 5 17.2 5.6 17.5 6.5L19 11" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                  <rect x="3" y="11" width="18" height="6.5" rx="2" stroke="white" stroke-width="1.4"/>
+                  <circle cx="7.5" cy="17.5" r="1.6" fill="white"/>
+                  <circle cx="16.5" cy="17.5" r="1.6" fill="white"/>
+                </svg>
+                <div class="absolute bottom-3 left-3 right-3 flex items-center justify-between">
+                  <span class="chip-dark">Sorteo estelar</span>
+                  <span class="chip-dark">#SA-2026</span>
+                </div>
+              </div>
+
+              <div class="px-4 pt-5 pb-4">
+                <p class="text-xs font-semibold text-adricar-goldDark uppercase tracking-wide">Premio principal</p>
+                <h3 class="font-display font-semibold text-2xl mt-1 text-adricar-indigo">Toyota Yaris 2026 0KM + S/ 10,000</h3>
+
+                <div class="grid grid-cols-4 gap-2 mt-5" id="hero-countdown">
+                  <div class="countdown-box"><span class="countdown-num" data-unit="days">--</span><span class="countdown-label">Días</span></div>
+                  <div class="countdown-box"><span class="countdown-num" data-unit="hours">--</span><span class="countdown-label">Hrs</span></div>
+                  <div class="countdown-box"><span class="countdown-num" data-unit="minutes">--</span><span class="countdown-label">Min</span></div>
+                  <div class="countdown-box"><span class="countdown-num" data-unit="seconds">--</span><span class="countdown-label">Seg</span></div>
+                </div>
+
+                <div class="mt-5">
+                  <div class="flex justify-between text-sm mb-1.5">
+                    <span class="text-adricar-muted">Tickets vendidos</span>
+                    <span class="font-semibold text-adricar-ink"><span class="counter-target" data-target="7820">0</span> / 10,000</span>
+                  </div>
+                  <div class="progress-track">
+                    <div class="progress-fill" style="width:0%" data-fill="78.2"></div>
+                  </div>
+                </div>
+
+                <div class="mt-5 flex items-center justify-between">
+                  <div>
+                    <p class="text-xs text-adricar-muted">Precio del ticket</p>
+                    <p class="font-display font-semibold text-xl text-adricar-indigo">S/ 15.00</p>
+                  </div>
+                  <button data-action="open-purchase" data-sorteo-id="s1" class="btn-gold text-sm px-5 py-2.5">Comprar ahora</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ============== LIVE VERIFICATION TICKER ============== -->
+    <section class="border-y border-adricar-line bg-white py-3.5 overflow-hidden">
+      <div class="flex items-center gap-3 px-5">
+        <span class="hidden sm:flex items-center gap-1.5 text-xs font-semibold text-adricar-emerald shrink-0 pr-3 border-r border-adricar-line">
+          <span class="w-1.5 h-1.5 rounded-full bg-adricar-emerald live-dot"></span>
+          EN VIVO
+        </span>
+        <div class="ticker-wrap">
+          <div class="ticker-track" id="verify-ticker"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============== HOW IT WORKS ============== -->
+    <section id="como-funciona" class="py-24 sm:py-28">
+      <div class="max-w-7xl mx-auto px-5 sm:px-8">
+        <div class="max-w-2xl mx-auto text-center reveal-up">
+          <p class="eyebrow justify-center">Cómo funciona</p>
+          <h2 class="section-title">De comprar a verificar, en cinco pasos claros</h2>
+          <p class="section-sub">Cada paso queda registrado. Tú controlas la verificación en cualquier momento, no solo el día del sorteo.</p>
+        </div>
+
+        <div class="mt-16 grid sm:grid-cols-2 lg:grid-cols-5 gap-x-6 gap-y-10 relative">
+          <div class="step-item reveal-up">
+            <div class="step-num">01</div>
+            <i data-lucide="shopping-cart" class="step-icon"></i>
+            <h3 class="step-title">Comprar</h3>
+            <p class="step-desc">Elige tu sorteo y cantidad de tickets. Las ofertas se aplican solas.</p>
+          </div>
+          <div class="step-item reveal-up reveal-delay-1">
+            <div class="step-num">02</div>
+            <i data-lucide="ticket" class="step-icon"></i>
+            <h3 class="step-title">Recibir tickets</h3>
+            <p class="step-desc">Tus códigos únicos llegan al instante a tu cuenta.</p>
+          </div>
+          <div class="step-item reveal-up reveal-delay-2">
+            <div class="step-num">03</div>
+            <i data-lucide="search-check" class="step-icon"></i>
+            <h3 class="step-title">Verificar participación</h3>
+            <p class="step-desc">Búscalo con tu DNI, teléfono o código cuando quieras.</p>
+          </div>
+          <div class="step-item reveal-up reveal-delay-3">
+            <div class="step-num">04</div>
+            <i data-lucide="clock" class="step-icon"></i>
+            <h3 class="step-title">Esperar el sorteo</h3>
+            <p class="step-desc">Sigue el conteo regresivo público hasta la fecha del sorteo.</p>
+          </div>
+          <div class="step-item reveal-up reveal-delay-4">
+            <div class="step-num">05</div>
+            <i data-lucide="award" class="step-icon"></i>
+            <h3 class="step-title">Recibir premio</h3>
+            <p class="step-desc">Coordinamos la entrega y publicamos la evidencia.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============== SORTEOS ACTIVOS ============== -->
+    <section id="sorteos" class="py-24 sm:py-28 bg-white border-y border-adricar-line">
+      <div class="max-w-7xl mx-auto px-5 sm:px-8">
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-6 reveal-up">
+          <div class="max-w-xl">
+            <p class="eyebrow">Sorteos activos</p>
+            <h2 class="section-title">Elige el sorteo, nosotros nos encargamos del resto</h2>
+          </div>
+          <div class="flex gap-2 flex-wrap" id="raffle-filters">
+            <button class="filter-chip is-active" data-filter="todos">Todos</button>
+            <button class="filter-chip" data-filter="dinero">Efectivo</button>
+            <button class="filter-chip" data-filter="producto">Productos</button>
+          </div>
+        </div>
+
+        <div id="raffles-grid" class="mt-12 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- Skeletons (replaced by JS render) -->
+          <div class="skeleton-card"><div class="skeleton-img"></div><div class="p-5 space-y-3"><div class="skeleton-line w-2/3"></div><div class="skeleton-line w-1/2"></div><div class="skeleton-line w-full h-8 mt-4"></div></div></div>
+          <div class="skeleton-card"><div class="skeleton-img"></div><div class="p-5 space-y-3"><div class="skeleton-line w-2/3"></div><div class="skeleton-line w-1/2"></div><div class="skeleton-line w-full h-8 mt-4"></div></div></div>
+          <div class="skeleton-card"><div class="skeleton-img"></div><div class="p-5 space-y-3"><div class="skeleton-line w-2/3"></div><div class="skeleton-line w-1/2"></div><div class="skeleton-line w-full h-8 mt-4"></div></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============== PANEL DE VERIFICACIÓN ============== -->
+    <section id="verificar" class="py-24 sm:py-28">
+      <div class="max-w-7xl mx-auto px-5 sm:px-8">
+        <div class="grid lg:grid-cols-2 gap-14 items-center">
+          <div class="reveal-up">
+            <p class="eyebrow">Panel de verificación</p>
+            <h2 class="section-title">Verifica tu participación en segundos</h2>
+            <p class="section-sub max-w-lg">Busca con tu DNI, teléfono o el código de tu ticket. Verás exactamente qué sorteo, cuántos tickets y con qué vendedora compraste.</p>
+
+            <ul class="mt-8 space-y-4">
+              <li class="flex items-start gap-3">
+                <span class="check-bullet"><i data-lucide="check" class="w-3.5 h-3.5"></i></span>
+                <span class="text-adricar-muted"><span class="font-semibold text-adricar-ink">Datos reales de tu compra:</span> cliente, sorteo, tickets, estado y método de pago.</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <span class="check-bullet"><i data-lucide="check" class="w-3.5 h-3.5"></i></span>
+                <span class="text-adricar-muted"><span class="font-semibold text-adricar-ink">Código QR de tu ticket</span> para presentarlo el día del sorteo.</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <span class="check-bullet"><i data-lucide="check" class="w-3.5 h-3.5"></i></span>
+                <span class="text-adricar-muted"><span class="font-semibold text-adricar-ink">Disponible las 24 horas</span>, no solo el día del sorteo.</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="reveal-up reveal-delay-1">
+            <div class="glass-panel p-6 sm:p-8">
+              <div class="flex gap-2 mb-6" id="verify-tabs">
+                <button class="verify-tab is-active" data-method="dni">DNI</button>
+                <button class="verify-tab" data-method="telefono">Teléfono</button>
+                <button class="verify-tab" data-method="codigo">Código de ticket</button>
+              </div>
+
+              <label class="text-sm font-semibold text-adricar-indigo" id="verify-label">Ingresa tu DNI</label>
+              <div class="mt-2 flex flex-col sm:flex-row gap-3">
+                <input id="verify-input" type="text" placeholder="Ej. 45678912" maxlength="20"
+                  class="input-field flex-1">
+                <button id="verify-submit" class="btn-primary justify-center px-6 py-3.5 whitespace-nowrap">
+                  <i data-lucide="search" class="w-[18px] h-[18px]"></i>
+                  Verificar
+                </button>
+              </div>
+              <p class="mt-3 text-xs text-adricar-muted">Datos de prueba: DNI <span class="font-mono text-adricar-indigo">45678912</span> · Teléfono <span class="font-mono text-adricar-indigo">987654321</span> · Código <span class="font-mono text-adricar-indigo">SA-8841-A2</span></p>
+
+              <div id="verify-result" class="mt-6"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============== GANADORES ============== -->
+    <section id="ganadores" class="py-24 sm:py-28 bg-white border-y border-adricar-line">
+      <div class="max-w-7xl mx-auto px-5 sm:px-8">
+        <div class="max-w-2xl mx-auto text-center reveal-up">
+          <p class="eyebrow justify-center">Ganadores reales</p>
+          <h2 class="section-title">Publicamos cada entrega, con evidencia</h2>
+          <p class="section-sub">Estos son sorteos ya finalizados. Cada ganador aparece aquí con su premio, fecha y evidencia de entrega.</p>
+        </div>
+        <div id="winners-grid" class="mt-14 grid sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+      </div>
+    </section>
+
+    <!-- ============== GALERÍA ============== -->
+    <section id="galeria" class="py-24 sm:py-28">
+      <div class="max-w-7xl mx-auto px-5 sm:px-8">
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-6 reveal-up">
+          <div class="max-w-xl">
+            <p class="eyebrow">Galería</p>
+            <h2 class="section-title">Momentos de entrega</h2>
+          </div>
+          <div class="flex gap-2" id="gallery-filters">
+            <button class="filter-chip is-active" data-filter="todos">Todo</button>
+            <button class="filter-chip" data-filter="foto">Fotos</button>
+            <button class="filter-chip" data-filter="video">Videos</button>
+          </div>
+        </div>
+        <div id="gallery-grid" class="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4"></div>
+      </div>
+    </section>
+
+    <!-- ============== TESTIMONIOS ============== -->
+    <section id="testimonios" class="py-24 sm:py-28 bg-white border-y border-adricar-line overflow-hidden">
+      <div class="max-w-7xl mx-auto px-5 sm:px-8">
+        <div class="max-w-2xl reveal-up">
+          <p class="eyebrow">Testimonios</p>
+          <h2 class="section-title">Lo que dicen quienes ya verificaron su premio</h2>
+        </div>
+      </div>
+      <div class="mt-12 testimonial-marquee-wrap">
+        <div class="testimonial-track" id="testimonial-track"></div>
+      </div>
+    </section>
+
+    <!-- ============== FAQ ============== -->
+    <section id="faq" class="py-24 sm:py-28">
+      <div class="max-w-3xl mx-auto px-5 sm:px-8">
+        <div class="text-center reveal-up">
+          <p class="eyebrow justify-center">Preguntas frecuentes</p>
+          <h2 class="section-title">Todo lo que preguntan antes de comprar</h2>
+        </div>
+        <div id="faq-accordion" class="mt-12 space-y-3"></div>
+      </div>
+    </section>
+
+    <!-- ============== CTA FINAL ============== -->
+    <section class="pb-24 sm:pb-28">
+      <div class="max-w-6xl mx-auto px-5 sm:px-8">
+        <div class="cta-banner reveal-up">
+          <div class="relative z-10 max-w-lg">
+            <h3 class="font-display font-semibold text-3xl sm:text-4xl text-white leading-tight">¿Listo para participar?</h3>
+            <p class="mt-3 text-white/80">Tu ticket queda registrado al instante y puedes verificarlo cuando quieras.</p>
+            <div class="mt-7 flex flex-col sm:flex-row gap-3">
+              <button data-action="open-purchase" class="btn-gold justify-center px-6 py-3.5">Comprar tickets</button>
+              <a href="#" data-action="open-whatsapp" class="btn-outline-light justify-center px-6 py-3.5">
+                <i data-lucide="message-circle" class="w-[18px] h-[18px]"></i>
+                Escribir por WhatsApp
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============== FOOTER ============== -->
+  <footer class="bg-adricar-indigo text-white/70 pt-20 pb-10">
+    <div class="max-w-7xl mx-auto px-5 sm:px-8">
+      <div class="grid sm:grid-cols-2 lg:grid-cols-5 gap-10 pb-14 border-b border-white/10">
+        <div class="lg:col-span-2">
+          <div class="flex items-center gap-2.5">
+            <span class="flex items-center justify-center w-10 h-10 rounded-xl bg-white/10">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 2L4 5.5V11C4 16.2 7.4 20.8 12 22C16.6 20.8 20 16.2 20 11V5.5L12 2Z" stroke="#E9A23B" stroke-width="1.7" stroke-linejoin="round"/><path d="M8.5 12L10.8 14.3L15.7 9.3" stroke="#E9A23B" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="font-display font-semibold text-lg text-white">Sorteos Adricar</span>
+          </div>
+          <p class="mt-5 text-sm leading-relaxed max-w-xs">Plataforma de sorteos verificados. Publicamos cada ganador con evidencia y damos acceso público a la verificación de participación.</p>
+          <div class="flex items-center gap-3 mt-6">
+            <a href="#" data-action="open-whatsapp" class="social-icon"><i data-lucide="message-circle" class="w-[18px] h-[18px]"></i></a>
+            <a href="#" class="social-icon"><i data-lucide="facebook" class="w-[18px] h-[18px]"></i></a>
+            <a href="#" class="social-icon"><i data-lucide="instagram" class="w-[18px] h-[18px]"></i></a>
+            <a href="#" class="social-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16.5 2h-3.1v13.6c0 1.6-1.3 2.9-2.9 2.9s-2.9-1.3-2.9-2.9 1.3-2.9 2.9-2.9c.3 0 .6 0 .9.1V9.6c-.3 0-.6-.1-.9-.1-3.1 0-5.7 2.5-5.7 5.7S8.4 21 11.5 21s5.7-2.5 5.7-5.7V8.9c1.1.8 2.5 1.3 4 1.3V7c-1.9 0-3.6-1-4.7-2.6-.5-.7-.9-1.5-1-2.4z"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <div>
+          <h4 class="text-white font-semibold text-sm mb-4">Plataforma</h4>
+          <ul class="space-y-2.5 text-sm">
+            <li><a href="#sorteos" class="footer-link">Sorteos activos</a></li>
+            <li><a href="#verificar" class="footer-link">Verificar participación</a></li>
+            <li><a href="#ganadores" class="footer-link">Ganadores</a></li>
+            <li><a href="#galeria" class="footer-link">Galería</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="text-white font-semibold text-sm mb-4">Soporte</h4>
+          <ul class="space-y-2.5 text-sm">
+            <li><a href="#faq" class="footer-link">Preguntas frecuentes</a></li>
+            <li><a href="#" data-action="open-whatsapp" class="footer-link">Contacto por WhatsApp</a></li>
+            <li><a href="#" data-action="open-terms" class="footer-link">Términos y condiciones</a></li>
+            <li><a href="#" data-action="open-privacy" class="footer-link">Políticas de privacidad</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="text-white font-semibold text-sm mb-4">Acceso</h4>
+          <ul class="space-y-2.5 text-sm">
+            <li><button data-action="open-admin" class="footer-link">Panel administrador</button></li>
+            <li><a href="mailto:hola@sorteosadricar.pe" class="footer-link">hola@sorteosadricar.pe</a></li>
+            <li><span class="footer-link cursor-default hover:text-white/70">+51 987 654 321</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="pt-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+        <p>© 2026 Sorteos Adricar. Todos los derechos reservados.</p>
+        <p>Prototipo con datos simulados — sin transacciones reales.</p>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<!-- ======================================================= -->
+<!-- ADMIN VIEW                                               -->
+<!-- ======================================================= -->
+<div id="admin-view" class="hidden fixed inset-0 z-[80] bg-adricar-bg">
+
+  <!-- Admin login gate -->
+  <div id="admin-login" class="min-h-screen flex items-center justify-center px-5">
+    <div class="w-full max-w-sm">
+      <button data-action="close-admin" class="flex items-center gap-1.5 text-sm text-adricar-muted hover:text-adricar-indigo mb-8 transition-colors">
+        <i data-lucide="arrow-left" class="w-4 h-4"></i> Volver al sitio
+      </button>
+      <div class="glass-panel p-8">
+        <div class="flex items-center gap-2.5 mb-1">
+          <span class="flex items-center justify-center w-10 h-10 rounded-xl bg-adricar-indigo">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 2L4 5.5V11C4 16.2 7.4 20.8 12 22C16.6 20.8 20 16.2 20 11V5.5L12 2Z" stroke="#E9A23B" stroke-width="1.7" stroke-linejoin="round"/><path d="M8.5 12L10.8 14.3L15.7 9.3" stroke="#E9A23B" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+          <span class="font-display font-semibold text-lg text-adricar-indigo">Panel Adricar</span>
+        </div>
+        <p class="text-sm text-adricar-muted mt-1 mb-7">Ingresa con tu cuenta de administrador.</p>
+
+        <form id="admin-login-form" class="space-y-4">
+          <div>
+            <label class="text-xs font-semibold text-adricar-indigo">Correo</label>
+            <input type="email" value="admin@sorteosadricar.pe" class="input-field mt-1.5" required>
+          </div>
+          <div>
+            <label class="text-xs font-semibold text-adricar-indigo">Contraseña</label>
+            <input type="password" value="••••••••" class="input-field mt-1.5" required>
+          </div>
+          <button type="submit" class="btn-primary w-full justify-center py-3.5 mt-2">
+            <i data-lucide="log-in" class="w-[18px] h-[18px]"></i>
+            Ingresar al panel
+          </button>
+        </form>
+        <p class="text-xs text-adricar-muted text-center mt-5">Acceso de demostración — cualquier dato ingresa.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin dashboard shell -->
+  <div id="admin-dashboard" class="hidden h-screen flex overflow-hidden">
+    <!-- Sidebar -->
+    <aside id="admin-sidebar" class="w-[248px] shrink-0 bg-adricar-indigo text-white flex flex-col h-screen">
+      <div class="h-[72px] flex items-center gap-2.5 px-6 border-b border-white/10 shrink-0">
+        <span class="flex items-center justify-center w-9 h-9 rounded-lg bg-white/10">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 2L4 5.5V11C4 16.2 7.4 20.8 12 22C16.6 20.8 20 16.2 20 11V5.5L12 2Z" stroke="#E9A23B" stroke-width="1.7" stroke-linejoin="round"/><path d="M8.5 12L10.8 14.3L15.7 9.3" stroke="#E9A23B" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+        <span class="font-display font-semibold text-[15px]">Panel Adricar</span>
+      </div>
+      <nav class="flex-1 overflow-y-auto py-5 px-3 space-y-1" id="admin-nav">
+        <button class="admin-nav-link is-active" data-page="dashboard"><i data-lucide="layout-dashboard" class="w-[18px] h-[18px]"></i> Dashboard</button>
+        <button class="admin-nav-link" data-page="sorteos"><i data-lucide="ticket" class="w-[18px] h-[18px]"></i> Sorteos</button>
+        <button class="admin-nav-link" data-page="compras"><i data-lucide="receipt" class="w-[18px] h-[18px]"></i> Compras</button>
+        <button class="admin-nav-link" data-page="clientes"><i data-lucide="users" class="w-[18px] h-[18px]"></i> Clientes</button>
+        <button class="admin-nav-link" data-page="vendedoras"><i data-lucide="user-round" class="w-[18px] h-[18px]"></i> Vendedoras</button>
+        <button class="admin-nav-link" data-page="ofertas"><i data-lucide="badge-percent" class="w-[18px] h-[18px]"></i> Ofertas</button>
+      </nav>
+      <div class="p-4 border-t border-white/10">
+        <button data-action="close-admin" class="admin-nav-link !text-white/60 hover:!text-white">
+          <i data-lucide="log-out" class="w-[18px] h-[18px]"></i> Salir al sitio
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <div class="flex-1 flex flex-col min-w-0 h-screen">
+      <header class="h-[72px] shrink-0 flex items-center justify-between px-7 bg-white border-b border-adricar-line">
+        <div>
+          <h1 id="admin-page-title" class="font-display font-semibold text-lg text-adricar-indigo">Dashboard</h1>
+          <p id="admin-page-sub" class="text-xs text-adricar-muted">Resumen general de la operación</p>
+        </div>
+        <div class="flex items-center gap-4">
+          <button class="w-9 h-9 rounded-lg flex items-center justify-center text-adricar-muted hover:bg-adricar-indigoPale transition-colors relative">
+            <i data-lucide="bell" class="w-[18px] h-[18px]"></i>
+            <span class="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-adricar-gold"></span>
+          </button>
+          <div class="flex items-center gap-2.5 pl-4 border-l border-adricar-line">
+            <div class="avatar-stack !w-9 !h-9 !text-xs" style="background:linear-gradient(135deg,#3D4FA0,#1B2456)">AD</div>
+            <div class="hidden sm:block">
+              <p class="text-sm font-semibold leading-tight">Admin Adricar</p>
+              <p class="text-xs text-adricar-muted leading-tight">Administrador</p>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div id="admin-content" class="flex-1 overflow-y-auto p-7 bg-adricar-bg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================================================= -->
+<!-- MODAL: PURCHASE WIZARD                                   -->
+<!-- ======================================================= -->
+<div id="modal-purchase" class="modal-overlay hidden">
+  <div class="modal-panel max-w-xl">
+    <div class="modal-head">
+      <div>
+        <p class="text-xs font-semibold text-adricar-gold uppercase tracking-wide" id="purchase-step-label">Paso 1 de 5</p>
+        <h3 class="font-display font-semibold text-xl text-adricar-indigo mt-0.5">Comprar tickets</h3>
+      </div>
+      <button data-action="close-modal" data-modal="modal-purchase" class="modal-close"><i data-lucide="x" class="w-5 h-5"></i></button>
+    </div>
+
+    <div class="px-6 pt-5">
+      <div class="flex gap-1.5" id="purchase-progress">
+        <span class="wizard-dot is-active"></span>
+        <span class="wizard-dot"></span>
+        <span class="wizard-dot"></span>
+        <span class="wizard-dot"></span>
+        <span class="wizard-dot"></span>
+      </div>
+    </div>
+
+    <div class="modal-body" id="purchase-body">
+      <!-- Step 1: elegir sorteo -->
+      <div class="purchase-step" data-step="1">
+        <p class="text-sm text-adricar-muted mb-4">Elige el sorteo en el que quieres participar.</p>
+        <div id="purchase-raffle-list" class="space-y-2.5 max-h-[360px] overflow-y-auto pr-1"></div>
+      </div>
+
+      <!-- Step 2: cantidad -->
+      <div class="purchase-step hidden" data-step="2">
+        <div id="purchase-selected-summary" class="mb-5"></div>
+        <p class="text-sm font-semibold text-adricar-indigo mb-3">¿Cuántos tickets quieres comprar?</p>
+        <div class="flex items-center gap-4">
+          <button data-action="qty-minus" class="qty-btn"><i data-lucide="minus" class="w-4 h-4"></i></button>
+          <input id="purchase-qty" type="number" min="1" value="2" class="w-24 text-center input-field font-display font-semibold text-xl">
+          <button data-action="qty-plus" class="qty-btn"><i data-lucide="plus" class="w-4 h-4"></i></button>
+        </div>
+        <p class="text-xs text-adricar-muted mt-3">Consejo: compra en las cantidades destacadas para llevarte tickets de regalo.</p>
+        <div class="grid grid-cols-3 gap-2 mt-4" id="offer-quick-picks"></div>
+      </div>
+
+      <!-- Step 3: ofertas aplicadas + calculo -->
+      <div class="purchase-step hidden" data-step="3">
+        <div id="offer-banner" class="hidden mb-5"></div>
+        <div class="rounded-2xl border border-adricar-line overflow-hidden">
+          <div class="bg-adricar-indigoPale px-5 py-3.5">
+            <p class="text-sm font-semibold text-adricar-indigo">Resumen de tu compra</p>
+          </div>
+          <div class="p-5 space-y-3" id="purchase-calc"></div>
+        </div>
+        <div class="mt-5">
+          <label class="text-xs font-semibold text-adricar-indigo">Tus datos</label>
+          <div class="grid sm:grid-cols-2 gap-3 mt-2">
+            <input id="buyer-name" type="text" placeholder="Nombre completo" class="input-field">
+            <input id="buyer-dni" type="text" placeholder="DNI" class="input-field">
+            <input id="buyer-phone" type="text" placeholder="Teléfono" class="input-field">
+            <input id="buyer-email" type="email" placeholder="Correo (opcional)" class="input-field">
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 4: Yape -->
+      <div class="purchase-step hidden" data-step="4">
+        <div class="yape-card">
+          <div class="flex items-center justify-between">
+            <span class="font-display font-semibold text-lg">Pagar con Yape</span>
+            <span class="yape-logo">yape</span>
+          </div>
+          <div class="mt-5 flex flex-col items-center">
+            <div class="qr-box">
+              <div class="qr-fake"></div>
+            </div>
+            <p class="mt-4 text-sm text-white/80">Escanea el código o yapea al número</p>
+            <p class="font-mono text-2xl font-semibold mt-1 tracking-wide">987 654 321</p>
+            <p class="text-sm text-white/80 mt-0.5">Adricar Sorteos E.I.R.L.</p>
+            <div class="mt-5 w-full flex items-center justify-between bg-white/10 rounded-xl px-4 py-3">
+              <span class="text-sm text-white/80">Monto a pagar</span>
+              <span id="yape-amount" class="font-display font-semibold text-2xl">S/ 0.00</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-5 space-y-3">
+          <div>
+            <label class="text-xs font-semibold text-adricar-indigo">Número de operación</label>
+            <input id="yape-operation" type="text" placeholder="Ej. 00458712" class="input-field mt-1.5">
+          </div>
+          <div>
+            <label class="text-xs font-semibold text-adricar-indigo">Comprobante de pago</label>
+            <label id="upload-dropzone" class="upload-dropzone mt-1.5">
+              <i data-lucide="upload-cloud" class="w-6 h-6 text-adricar-indigoLight"></i>
+              <span class="text-sm text-adricar-muted mt-1.5" id="upload-label">Toca para subir tu captura de Yape</span>
+              <input id="upload-input" type="file" accept="image/*" class="hidden">
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 5: confirmación -->
+      <div class="purchase-step hidden" data-step="5">
+        <div class="flex flex-col items-center text-center py-4">
+          <div class="success-check">
+            <i data-lucide="check" class="w-8 h-8"></i>
+          </div>
+          <h3 class="font-display font-semibold text-2xl text-adricar-indigo mt-5">Compra registrada correctamente</h3>
+          <p class="text-adricar-muted mt-2 max-w-xs">Tu comprobante quedó en revisión. Te avisaremos por WhatsApp apenas se apruebe.</p>
+          <div class="w-full mt-6 rounded-2xl border border-adricar-line divide-y divide-adricar-line text-left" id="purchase-confirmation-detail"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-foot" id="purchase-footer"></div>
+  </div>
+</div>
+
+<!-- ======================================================= -->
+<!-- MODAL: GENERIC (used by admin CRUD forms)                -->
+<!-- ======================================================= -->
+<div id="modal-generic" class="modal-overlay hidden">
+  <div class="modal-panel max-w-lg">
+    <div class="modal-head">
+      <h3 class="font-display font-semibold text-xl text-adricar-indigo" id="generic-modal-title">Título</h3>
+      <button data-action="close-modal" data-modal="modal-generic" class="modal-close"><i data-lucide="x" class="w-5 h-5"></i></button>
+    </div>
+    <div class="modal-body" id="generic-modal-body"></div>
+    <div class="modal-foot" id="generic-modal-footer"></div>
+  </div>
+</div>
+
+<!-- ======================================================= -->
+<!-- MODAL: CONFIRM (delete / approve / reject)                -->
+<!-- ======================================================= -->
+<div id="modal-confirm" class="modal-overlay hidden">
+  <div class="modal-panel max-w-sm">
+    <div class="p-6 text-center">
+      <div id="confirm-icon" class="confirm-icon"><i data-lucide="alert-triangle" class="w-6 h-6"></i></div>
+      <h3 id="confirm-title" class="font-display font-semibold text-lg text-adricar-indigo mt-4">¿Estás seguro?</h3>
+      <p id="confirm-message" class="text-sm text-adricar-muted mt-2">Esta acción no se puede deshacer.</p>
+      <div class="flex gap-3 mt-6">
+        <button data-action="close-modal" data-modal="modal-confirm" class="btn-outline flex-1 justify-center py-2.5">Cancelar</button>
+        <button id="confirm-accept-btn" class="btn-danger flex-1 justify-center py-2.5">Confirmar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================================================= -->
+<!-- MODAL: DETAILS VIEW (view-only, sorteos/compras/clientes) -->
+<!-- ======================================================= -->
+<div id="modal-details" class="modal-overlay hidden">
+  <div class="modal-panel max-w-lg">
+    <div class="modal-head">
+      <h3 class="font-display font-semibold text-xl text-adricar-indigo" id="details-modal-title">Detalles</h3>
+      <button data-action="close-modal" data-modal="modal-details" class="modal-close"><i data-lucide="x" class="w-5 h-5"></i></button>
+    </div>
+    <div class="modal-body" id="details-modal-body"></div>
+  </div>
+</div>
+
+<!-- ======================================================= -->
+<!-- MODAL: RAFFLE DETAILS (public)                            -->
+<!-- ======================================================= -->
+<div id="modal-raffle-details" class="modal-overlay hidden">
+  <div class="modal-panel max-w-2xl">
+    <button data-action="close-modal" data-modal="modal-raffle-details" class="modal-close !absolute right-5 top-5 z-10"><i data-lucide="x" class="w-5 h-5"></i></button>
+    <div id="raffle-details-body"></div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
